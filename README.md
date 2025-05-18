@@ -15,7 +15,7 @@ Ce projet est une application CRM développée en **Symfony 7.2** avec une archi
   - Docker
   - Nginx
   - MySQL
-  - MailDev (pour tests emails)
+ 
 
 ---
 
