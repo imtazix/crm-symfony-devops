@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le client{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Modifier le client</h2>
+
+    <div class="card shadow-sm p-4">
+        {{ form_start(form) }}
+            <div class="mb-3">
+                {{ form_label(form.nomGerant) }}
+                {{ form_widget(form.nomGerant, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.raisonSociale) }}
+                {{ form_widget(form.raisonSociale, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.telephone) }}
+                {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.adresse) }}
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.ville) }}
+                {{ form_widget(form.ville, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.pays) }}
+                {{ form_widget(form.pays, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <button class="btn btn-success">Enregistrer</button>
+            <a href="{{ path('client_list') }}" class="btn btn-secondary ms-2">Retour</a>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

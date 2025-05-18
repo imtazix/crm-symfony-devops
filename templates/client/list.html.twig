@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des clients{% endblock %}
+
+{% block body %}
+<h1>Liste des clients</h1>
+
+<a href="{{ path('client_create') }}" class="btn btn-primary mb-3">Créer un nouveau client</a>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nom Gérant</th>
+            <th>Raison Sociale</th>
+            <th>Téléphone</th>
+            <th>Adresse</th>
+            <th>Ville</th>
+            <th>Pays</th>
+            <th>Factures</th> {# nouvelle colonne #}
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+            <tr>
+                <td>{{ client.nomGerant }}</td>
+                <td>{{ client.raisonSociale }}</td>
+                <td>{{ client.telephone }}</td>
+                <td>{{ client.adresse }}</td>
+                <td>{{ client.ville }}</td>
+                <td>{{ client.pays }}</td>
+                <td>
+                    <a href="{{ path('facture_list', { clientId: client.id }) }}" class="btn btn-sm btn-info">
+                        Voir les factures ({{ client.factures|length }})
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ path('client_edit', {id: client.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+
+                    <form action="{{ path('client_delete', {id: client.id}) }}" method="post" style="display:inline-block" onsubmit="return confirm('Voulez-vous vraiment supprimer ce client ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_client_' ~ client.id) }}">
+                        <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="8">Aucun client trouvé.</td></tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+{% endblock %}

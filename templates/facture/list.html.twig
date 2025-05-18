@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Factures de {{ client.nomGerant }}{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Factures de {{ client.nomGerant }}</h1>
+
+<a href="{{ path('facture_create', { clientId: client.id }) }}" class="btn btn-primary mb-3">Ajouter une facture</a>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Numéro</th>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>État</th>
+            <th>Note</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for facture in factures %}
+            <tr>
+                <td>{{ facture.numero }}</td>
+                <td>{{ facture.date|date('d/m/Y') }}</td>
+                <td>{{ facture.montant }} MAD</td>
+                <td>{{ facture.etat }}</td>
+                <td>{{ facture.note }}</td>
+                <td>
+                    <a href="{{ path('facture_edit', { id: facture.id }) }}" class="btn btn-sm btn-warning">Modifier</a>
+
+                    <form action="{{ path('facture_delete', { id: facture.id }) }}" method="post" style="display:inline-block;" onsubmit="return confirm('Supprimer cette facture ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_facture_' ~ facture.id) }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">Aucune facture trouvée pour ce client.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

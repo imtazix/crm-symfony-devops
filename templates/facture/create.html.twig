@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une facture{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Créer une facture pour <strong>{{ client.nomGerant }}</strong></h2>
+
+    <div class="card shadow-sm p-4">
+        {{ form_start(form) }}
+            <div class="mb-3">
+                {{ form_label(form.numero) }}
+                {{ form_widget(form.numero, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.date) }}
+                {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.montant) }}
+                {{ form_widget(form.montant, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.etat) }}
+                {{ form_widget(form.etat, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.note) }}
+                {{ form_widget(form.note, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <button class="btn btn-success">Créer</button>
+            <a href="{{ path('facture_list', { clientId: client.id }) }}" class="btn btn-secondary ms-2">Retour</a>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
