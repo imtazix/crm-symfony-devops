@@ -1,11 +1,25 @@
 FROM php:8.2-fpm
 
-# Install system deps
+# Installer les dépendances système
 RUN apt-get update && apt-get install -y \
-    libzip-dev zip unzip git curl libpng-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
+    libpq-dev \
+    zip unzip git curl libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo pdo_mysql
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Installer Composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
+# Définir le dossier de travail
 WORKDIR /var/www/html
+
+# Copier le projet
+COPY . .
+
+# Donner les droits (à adapter si nécessaire)
+RUN chown -R www-data:www-data /var/www/html
+
+# Installer les dépendances PHP
+RUN composer install
+
+EXPOSE 9000
+CMD ["php-fpm"]
