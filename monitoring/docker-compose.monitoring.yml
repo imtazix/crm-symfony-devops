@@ -6,9 +6,8 @@ services:
     container_name: prometheus
     ports:
       - "9099:9090"  # Host:Container
-   volumes:
-  - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - monitoring
 
@@ -16,7 +15,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "3033:3000"
+      - "3033:3000"  # Host:Container
     networks:
       - monitoring
 
