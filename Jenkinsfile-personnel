@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = 'http://localhost:9000'
-        SONAR_LOGIN = credentials('sonar-token') // Ton token Sonar
+        SONAR_LOGIN = credentials('sonar-token')
         DOCKER_IMAGE = 'imtazix/crm-symfony-devops'
     }
 
@@ -17,14 +17,16 @@ pipeline {
         stage('Composer install') {
             agent {
                 docker {
-                    image 'composer:2.5'
+                    image 'php:8.2-cli'
                     args '-v /var/run/docker.sock:/var/run/docker.sock'
-                    shell '/bin/ash' // ✅ ajoute ce shell spécifique à Alpine
                 }
             }
             steps {
-                sh 'composer install'
-                sh 'php bin/console cache:clear || true'
+                sh '''
+                    curl -sS https://getcomposer.org/installer | php
+                    php composer.phar install
+                    php bin/console cache:clear || true
+                '''
             }
         }
 
