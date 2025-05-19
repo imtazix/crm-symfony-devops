@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         DOCKER_IMAGE = "imtazix/crm-symfony-devops"
     }
 
@@ -15,25 +16,22 @@ pipeline {
 
         stage('Composer Install') {
             steps {
-                echo "Installation des dépendances PHP"
-                script {
-                    def command = '''#!/bin/bash
-                    composer install
+                echo 'Installation des dépendances PHP'
+                sh '''
+                    composer install --no-interaction
                     php bin/console cache:clear || true
-                    '''
-                    writeFile file: 'install.sh', text: command
-                    sh 'chmod +x install.sh && ./install.sh'
-                }
+                '''
             }
         }
 
-        stage('Build Docker image') {
+        stage('Docker Build') {
             steps {
-                sh "docker build -t $DOCKER_IMAGE ."
+                echo 'Construction de l\'image Docker...'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Docker Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
