@@ -7,7 +7,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Cloner le projet') {
             steps {
                 git credentialsId: 'github-token', url: 'https://github.com/imtazix/crm-symfony-devops.git', branch: 'main'
             }
@@ -16,32 +16,29 @@ pipeline {
         stage('Composer Install') {
             steps {
                 echo "Installation des dépendances PHP"
-                // ✅ Important : appel explicite via /bin/bash
                 sh '/bin/bash -c "composer install"'
                 sh '/bin/bash -c "php bin/console cache:clear || true"'
             }
         }
 
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
+                echo "Construction de l'image Docker"
                 sh '/bin/bash -c "docker build -t $DOCKER_IMAGE ."'
             }
         }
 
-        stage('Docker Push') {
+        stage('Push to DockerHub') {
             steps {
+                echo "Push de l'image sur DockerHub"
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''/bin/bash -c "
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin &&
+                    sh '''
+                        /bin/bash -c "
+                        echo \\"$DOCKER_PASS\\" | docker login -u \\"$DOCKER_USER\\" --password-stdin &&
                         docker push $DOCKER_IMAGE
-                    "'''
+                        "
+                    '''
                 }
-            }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                sh '/bin/bash -c "docker run -d --name crm-symfony-app $DOCKER_IMAGE"'
             }
         }
     }
