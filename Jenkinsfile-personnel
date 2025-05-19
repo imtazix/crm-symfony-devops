@@ -20,12 +20,13 @@ pipeline {
                     args '-v $WORKSPACE:/app -w /app'
                 }
             }
-            options {
-                shell '/bin/bash'  // ✅ car "sh" n'existe pas dans l'image "composer"
-            }
             steps {
-                sh 'composer install --no-interaction --prefer-dist'
-                sh 'php bin/console cache:clear || true'
+                // Exécution directe des commandes avec /bin/bash pour contourner le problème 'sh'
+                sh '''
+                    #!/bin/bash
+                    composer install --no-interaction --prefer-dist
+                    php bin/console cache:clear || true
+                '''
             }
         }
 
