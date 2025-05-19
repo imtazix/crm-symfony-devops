@@ -1,15 +1,15 @@
 global:
-  scrape_interval: 15s
+  scrape_interval: 15s        # ✔️ Fréquence de scraping raisonnable
 
 scrape_configs:
-  - job_name: 'symfony'
+  - job_name: 'symfony'       # ✔️ Nom du job
     static_configs:
-      - targets: ['symfony-app:8000']
+      - targets: ['symfony-app:8000']    # ✔️ Nom du conteneur Symfony confirmé avec `docker ps`
         labels:
-          service: symfony
+          service: symfony    # ✔️ Label pour les filtres Grafana
 
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['localhost:9090']      # ✔️ C’est Prometheus lui-même
         labels:
           service: prometheus
