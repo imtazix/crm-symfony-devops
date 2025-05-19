@@ -6,37 +6,29 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Cloner le projet') {
             steps {
                 git credentialsId: 'github-token', url: 'https://github.com/imtazix/crm-symfony-devops.git', branch: 'main'
             }
         }
 
-        stage('Composer install') {
-            agent {
-                docker {
-                    image 'composer:2.5'
-                    args '-v $WORKSPACE:/app -w /app'
-                }
-            }
+        stage('Installer les dépendances Composer') {
             steps {
-                // Exécution directe des commandes avec /bin/bash pour contourner le problème 'sh'
-                sh '''
-                    #!/bin/bash
-                    composer install --no-interaction --prefer-dist
-                    php bin/console cache:clear || true
-                '''
+                echo "Installation des dépendances..."
+                // Composer doit être installé sur le Mac (via Brew ou globalement)
+                sh 'composer install'
+                sh 'php bin/console cache:clear || true'
             }
         }
 
-        stage('Build Docker image') {
+        stage('Build de l’image Docker') {
             steps {
+                echo "Construction de l’image Docker..."
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push sur DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
