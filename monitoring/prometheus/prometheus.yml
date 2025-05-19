@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s  # fréquence de récupération des métriques
+
+scrape_configs:
+  - job_name: 'symfony'
+    static_configs:
+      - targets: ['host.docker.internal:8000']  # Port Symfony local (modifie si différent)
+        labels:
+          service: symfony
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: prometheus
