@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = 'http://localhost:9000'
-        SONAR_LOGIN = credentials('sonar-token') // Ton token Sonar ici
-        DOCKER_IMAGE = 'imtazix/crm-symfony-devops' // Ton image DockerHub
+        SONAR_LOGIN = credentials('sonar-token') // Ton token Sonar
+        DOCKER_IMAGE = 'imtazix/crm-symfony-devops'
     }
 
     stages {
@@ -19,6 +19,7 @@ pipeline {
                 docker {
                     image 'composer:2.5'
                     args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    shell '/bin/ash' // ✅ ajoute ce shell spécifique à Alpine
                 }
             }
             steps {
