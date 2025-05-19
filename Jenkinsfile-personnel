@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         DOCKER_IMAGE = "imtazix/crm-symfony-devops"
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Docker.app/Contents/Resources/bin" // 🛠️ Ajouté ici
     }
 
     stages {
-
         stage('Cloner le projet') {
             steps {
                 git credentialsId: 'github-token', url: 'https://github.com/imtazix/crm-symfony-devops.git', branch: 'main'
@@ -17,10 +16,8 @@ pipeline {
         stage('Composer Install') {
             steps {
                 echo 'Installation des dépendances PHP'
-                sh '''
-                    composer install --no-interaction
-                    php bin/console cache:clear || true
-                '''
+                sh 'composer install --no-interaction'
+                sh 'php bin/console cache:clear || true'
             }
         }
 
