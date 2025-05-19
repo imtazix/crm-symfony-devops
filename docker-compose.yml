@@ -11,7 +11,7 @@ services:
     depends_on:
       - database
     networks:
-      - symfony
+      - monitoring
 
   nginx:
     image: nginx:latest
@@ -24,7 +24,7 @@ services:
     depends_on:
       - app
     networks:
-      - symfony
+      - monitoring
 
   database:
     image: mysql:8.0
@@ -38,10 +38,11 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - symfony
+      - monitoring
 
 volumes:
   db_data:
 
 networks:
-  symfony:
+  monitoring:
+    external: false
