@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        SONAR_HOST_URL = 'http://localhost:9000'
-        SONAR_LOGIN = credentials('sonar-token')
-        DOCKER_IMAGE = 'imtazix/crm-symfony-devops'
+        DOCKER_IMAGE = "imtazix/crm-symfony-devops"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git credentialsId: 'github-token', url: 'https://github.com/imtazix/crm-symfony-devops.git', branch: 'main'
@@ -17,47 +16,23 @@ pipeline {
         stage('Composer install') {
             agent {
                 docker {
-                    image 'php:8.2-cli'
+                    image 'composer:2.5'
                     args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps {
-                sh '''
-                    curl -sS https://getcomposer.org/installer | php
-                    php composer.phar install
-                    php bin/console cache:clear || true
-                '''
-            }
-        }
-
-        stage('Analyse SonarQube') {
-            environment {
-                PATH = "/opt/sonar-scanner/bin:$PATH"
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        sonar-scanner \
-                          -Dsonar.projectKey=crm-symfony-devops \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=$SONAR_HOST_URL \
-                          -Dsonar.login=$SONAR_LOGIN
-                    '''
-                }
+                sh 'composer install'
+                sh 'php bin/console cache:clear || true'
             }
         }
 
         stage('Build Docker image') {
             steps {
-                retry(3) {
-                    timeout(time: 5, unit: 'MINUTES') {
-                        sh 'docker build -t $DOCKER_IMAGE .'
-                    }
-                }
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
-        stage('Push DockerHub') {
+        stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
@@ -67,5 +42,6 @@ pipeline {
                 }
             }
         }
+
     }
 }
