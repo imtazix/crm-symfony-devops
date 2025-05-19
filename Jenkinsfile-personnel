@@ -3,10 +3,11 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "imtazix/crm-symfony-devops"
-        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Docker.app/Contents/Resources/bin" // 🛠️ Ajouté ici
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Docker.app/Contents/Resources/bin"
     }
 
     stages {
+
         stage('Cloner le projet') {
             steps {
                 git credentialsId: 'github-token', url: 'https://github.com/imtazix/crm-symfony-devops.git', branch: 'main'
@@ -18,6 +19,22 @@ pipeline {
                 echo 'Installation des dépendances PHP'
                 sh 'composer install --no-interaction'
                 sh 'php bin/console cache:clear || true'
+            }
+        }
+
+        stage('Analyse SonarQube') {
+            steps {
+                echo 'Analyse du code avec SonarQube'
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=crm-symfony-devops \
+                          -Dsonar.sources=. \
+                          -Dsonar.php.coverage.reportPaths=coverage.xml \
+                          -Dsonar.host.url=http://localhost:9000 \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
+                }
             }
         }
 
