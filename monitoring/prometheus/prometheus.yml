@@ -1,10 +1,10 @@
 global:
-  scrape_interval: 15s  # fréquence de récupération des métriques
+  scrape_interval: 15s
 
 scrape_configs:
   - job_name: 'symfony'
     static_configs:
-      - targets: ['host.docker.internal:8000']  # Port Symfony local (modifie si différent)
+      - targets: ['172.17.0.1:8000']  # <- IP de ta machine Debian
         labels:
           service: symfony
 
