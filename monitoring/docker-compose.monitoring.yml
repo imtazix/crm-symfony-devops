@@ -6,8 +6,9 @@ services:
     container_name: prometheus
     ports:
       - "9099:9090"  # Host:Container
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+   volumes:
+  - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
     networks:
       - monitoring
 
