@@ -6,36 +6,42 @@ pipeline {
     }
 
     stages {
-        stage('Cloner le projet') {
+
+        stage('Checkout') {
             steps {
                 git credentialsId: 'github-token', url: 'https://github.com/imtazix/crm-symfony-devops.git', branch: 'main'
             }
         }
 
-        stage('Installer les dépendances Composer') {
+        stage('Composer Install') {
             steps {
-                echo "Installation des dépendances..."
-                // Composer doit être installé sur le Mac (via Brew ou globalement)
-                sh 'composer install'
-                sh 'php bin/console cache:clear || true'
+                echo "Installation des dépendances PHP"
+                // ✅ Important : appel explicite via /bin/bash
+                sh '/bin/bash -c "composer install"'
+                sh '/bin/bash -c "php bin/console cache:clear || true"'
             }
         }
 
-        stage('Build de l’image Docker') {
+        stage('Docker Build') {
             steps {
-                echo "Construction de l’image Docker..."
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh '/bin/bash -c "docker build -t $DOCKER_IMAGE ."'
             }
         }
 
-        stage('Push sur DockerHub') {
+        stage('Docker Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    sh '''/bin/bash -c "
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin &&
                         docker push $DOCKER_IMAGE
-                    '''
+                    "'''
                 }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh '/bin/bash -c "docker run -d --name crm-symfony-app $DOCKER_IMAGE"'
             }
         }
     }
