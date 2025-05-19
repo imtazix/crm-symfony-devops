@@ -16,27 +16,29 @@ pipeline {
         stage('Composer Install') {
             steps {
                 echo "Installation des dépendances PHP"
-                sh '/bin/bash -c "composer install"'
-                sh '/bin/bash -c "php bin/console cache:clear || true"'
+                script {
+                    def command = '''#!/bin/bash
+                    composer install
+                    php bin/console cache:clear || true
+                    '''
+                    writeFile file: 'install.sh', text: command
+                    sh 'chmod +x install.sh && ./install.sh'
+                }
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker image') {
             steps {
-                echo "Construction de l'image Docker"
-                sh '/bin/bash -c "docker build -t $DOCKER_IMAGE ."'
+                sh "docker build -t $DOCKER_IMAGE ."
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                echo "Push de l'image sur DockerHub"
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
-                        /bin/bash -c "
-                        echo \\"$DOCKER_PASS\\" | docker login -u \\"$DOCKER_USER\\" --password-stdin &&
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                         docker push $DOCKER_IMAGE
-                        "
                     '''
                 }
             }
